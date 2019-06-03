@@ -1,5 +1,7 @@
 #include "hwlib.hpp"
 
+#include <rtos.hpp>
+
 int main(void) {
   // kill the watchdog
     WDT->WDT_MR = WDT_MR_WDDIS;
@@ -8,4 +10,6 @@ int main(void) {
         hwlib::cout << "this works via arduino";
         hwlib::wait_ms(1000);
     }
+
+    rtos::run();
 }
