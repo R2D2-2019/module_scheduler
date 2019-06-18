@@ -3,14 +3,20 @@
 #include <alloc.hpp>
 #include <array>
 #include <base_module.hpp>
+#include <comm.hpp>
+#include <module_task_base.hpp>
 #include <rtos.hpp>
+
 
 namespace r2d2::module_scheduler {
     template <typename ModuleType, int StackSize = 4096,
               int WaitableAllocSize = 128>
-    class module_task_c : public rtos::task<StackSize> {
+    class module_task_c : public rtos::task<StackSize>,
+                          public module_task_base_c {
+    private:
+        size_t next_waitable_index = 0;
+
     protected:
-        comm_c comm;
         // The module we are wrapping
         ModuleType module;
 
@@ -19,14 +25,12 @@ namespace r2d2::module_scheduler {
         // ourselfs.
         arena_alloc_c<WaitableAllocSize> allocator;
 
-        // All waitables that can trigger this module
-        // to run
-        std::array<rtos::waitable *, 4> waitables;
-
     public:
         template <typename... Args>
         explicit module_task_c(Args &&... args)
-            : comm(), module(comm, std::forward<Args>(args)...) {
+            : module(comm, std::forward<Args>(args)...) {
+            auto &flag = create_waitable<rtos::flag>("start_flag");
+            (void)flag;
         }
 
         /**
@@ -36,20 +40,18 @@ namespace r2d2::module_scheduler {
          */
         template <typename T, typename... Args>
         T &create_waitable(Args &&... args) {
-            if (waitables.size() == 4) {
+            if (next_waitable_index == 4) {
                 // Too many waitables
                 HWLIB_PANIC_WITH_LOCATION;
             }
 
-            size_t pos = waitables.size();
             void *mem = allocator.alloc(sizeof(T));
-            waitables[pos] = new (mem) T(this, std::forward<Args>(args)...);
+            T *waitable;
+            waitables[next_waitable_index] = waitable =
+                new (mem) T(this, std::forward<Args>(args)...);
+            next_waitable_index++;
 
-            return *(static_cast<T *>(waitables[pos]));
-        }
-
-        std::array<rtos::waitable *, 4> &get_waitables() {
-            return waitables;
+            return *waitable;
         }
 
         void main() override {

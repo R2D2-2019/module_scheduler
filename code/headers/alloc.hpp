@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <stdint.h>
 
 namespace r2d2::module_scheduler {
     template <size_t Size>
