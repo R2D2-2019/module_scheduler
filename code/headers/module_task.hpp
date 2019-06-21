@@ -7,7 +7,6 @@
 #include <module_task_base.hpp>
 #include <rtos.hpp>
 
-
 namespace r2d2::module_scheduler {
     template <typename ModuleType, int StackSize = 4096,
               int WaitableAllocSize = 128>
@@ -28,7 +27,8 @@ namespace r2d2::module_scheduler {
     public:
         template <typename... Args>
         explicit module_task_c(Args &&... args)
-            : module(comm, std::forward<Args>(args)...) {
+            : rtos::task<StackSize>(400, "module"),
+              module(comm, std::forward<Args>(args)...) {
             auto &flag = create_waitable<rtos::flag>("start_flag");
             (void)flag;
         }
@@ -41,6 +41,7 @@ namespace r2d2::module_scheduler {
         template <typename T, typename... Args>
         T &create_waitable(Args &&... args) {
             if (next_waitable_index == 4) {
+                hwlib::cout << "Too many waitables!!" << hwlib::endl;
                 // Too many waitables
                 HWLIB_PANIC_WITH_LOCATION;
             }
@@ -55,8 +56,10 @@ namespace r2d2::module_scheduler {
         }
 
         void main() override {
-            this->wait();
-            module.process();
+            for (;;) {
+                this->wait();
+                module.process();
+            }
         }
     };
 } // namespace r2d2::module_scheduler

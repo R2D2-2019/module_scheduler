@@ -12,6 +12,7 @@ public:
     }
 
     void process() override {
+        hwlib::cout << "led-module" << hwlib::endl;
     }
 };
 class module : public r2d2::base_module_c {
@@ -20,6 +21,7 @@ public:
     }
 
     void process() override {
+        hwlib::cout << "module" << hwlib::endl;
     }
 };
 
@@ -35,8 +37,8 @@ int main(void) {
     auto task = r2d2::module_scheduler::module_task_c<led_module>(led);
     can_task.add_task(&task);
 
-    auto task2 = r2d2::module_scheduler::module_task_c<module>();
-    can_task.add_task(&task2);
+    // auto task2 = r2d2::module_scheduler::module_task_c<module>();
+    // can_task.add_task(&task2);
 
     rtos::run();
 }
