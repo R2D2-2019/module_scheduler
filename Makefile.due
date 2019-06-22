@@ -15,6 +15,10 @@ CONSOLE_BAUDRATE  ?= 2400
 STACK_SIZE        ?= 81920
 HEAP              ?= BMPTK
 
+# add rtos
+RTOS              ?= ../../../libraries/rtos
+include           $(RTOS)/makefile.inc
+
 # defer to the Makefile.link
 include           $(RELATIVE)/Makefile.link
 
