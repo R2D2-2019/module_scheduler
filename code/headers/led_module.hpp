@@ -39,11 +39,12 @@ namespace r2d2::led {
                 const auto data =
                     frame.as_frame_type<frame_type::ACTIVITY_LED_STATE>();
 
-                hwlib::cout << "pre led write" << hwlib::endl;
-                hwlib::cout << uint32_t(&led) << hwlib::endl;
+                // hwlib::cout << "pre led write" << hwlib::endl;
+                // hwlib::cout << uint32_t(&led) << hwlib::endl;
+                // hwlib::cout << data.state << hwlib::endl;
                 // Set the LED state to the given value
                 led.write(data.state);
-                hwlib::cout << "post led write" << hwlib::endl;
+                // hwlib::cout << "post led write" << hwlib::endl;
             }
         }
     };

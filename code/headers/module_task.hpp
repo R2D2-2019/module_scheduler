@@ -25,7 +25,10 @@ namespace r2d2::module_scheduler {
     public:
         template <typename... Args>
         explicit module_task_c(Args &&... args)
-            : module(comm, std::forward<Args>(args)...) {
+            : rtos::task<StackSize>("task_module"),
+              module_task_base_c(),
+              module(comm, std::forward<Args>(args)...),
+              allocator() {
             auto &flag = create_waitable<rtos::flag>("start_flag");
             (void)flag;
         }
