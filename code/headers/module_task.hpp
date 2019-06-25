@@ -2,8 +2,6 @@
 
 #include <alloc.hpp>
 #include <array>
-#include <base_module.hpp>
-#include <comm.hpp>
 #include <module_task_base.hpp>
 #include <rtos.hpp>
 
