@@ -26,7 +26,6 @@ namespace r2d2::button {
          * Let the module process data.
          */
         void process() override {
-            hwlib::cout << "button" << hwlib::endl;
             while (comm.has_data()) {
                 auto frame = comm.get_data();
 

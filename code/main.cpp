@@ -8,66 +8,38 @@
 #include <controler_module.hpp>
 #include <led_module.hpp>
 
-class led_task_c
-    : public r2d2::module_scheduler::module_task_c<r2d2::led::module_c> {
-private:
-    template <typename T, typename... Args>
-    static T *allocate(Args &&... args) {
-        static uint8_t alloc[64];
-        static uint8_t *pos = alloc;
+namespace r2d2::module_scheduler {
 
-        uint32_t alignment = uint_fast32_t(pos) & 3;
-        if (alignment != 0) {
-            pos += 4 - alignment;
+    class led_task_c : public module_task_c<r2d2::led::module_c> {
+    public:
+        led_task_c(alloc_c &alloc)
+            : module_task_c(alloc.alloc_object<hwlib::target::pin_out>(
+                  hwlib::target::pins::led)) {
+        }
+    };
+
+    class controller_task_c : public module_task_c<r2d2::controller::module_c> {
+    public:
+        controller_task_c(alloc_c &alloc) : module_task_c() {
+        }
+    };
+
+    class button_task_c : public module_task_c<r2d2::button::module_c> {
+    private:
+        static hwlib::target::pin_in &
+        allocate_pin_with_pullup(alloc_c &alloc, hwlib::target::pins pin) {
+            auto &pin_in = alloc.alloc_object<hwlib::target::pin_in>(pin);
+            pin_in.pullup_enable();
+            return pin_in;
         }
 
-        void *addr = static_cast<void *>(pos);
-        pos += sizeof(T);
-        return new (addr) T(std::forward<Args>(args)...);
-    }
-
-public:
-    led_task_c()
-        : module_task_c(
-              *allocate<hwlib::target::pin_out>(hwlib::target::pins::led)) {
-    }
-};
-
-class controller_task_c
-    : public r2d2::module_scheduler::module_task_c<r2d2::controller::module_c> {
-
-public:
-    controller_task_c() : module_task_c() {
-    }
-};
-
-class button_task_c
-    : public r2d2::module_scheduler::module_task_c<r2d2::button::module_c> {
-private:
-    template <typename T, typename... Args>
-    static T *allocate(Args &&... args) {
-        static uint8_t alloc[64];
-        static uint8_t *pos = alloc;
-
-        uint32_t alignment = uint_fast32_t(pos) & 3;
-        if (alignment != 0) {
-            pos += 4 - alignment;
+    public:
+        button_task_c(alloc_c &alloc)
+            : module_task_c(
+                  allocate_pin_with_pullup(alloc, hwlib::target::pins::d53)) {
         }
-
-        void *addr = static_cast<void *>(pos);
-        pos += sizeof(T);
-        return new (addr) T(std::forward<Args>(args)...);
-    }
-
-    hwlib::target::pin_in *button;
-
-public:
-    button_task_c()
-        : module_task_c(
-              *allocate<hwlib::target::pin_in>(hwlib::target::pins::d53)) {
-        // button.pullup_enable();
-    }
-};
+    };
+} // namespace r2d2::module_scheduler
 
 int main(void) {
     // kill the watchdog
@@ -76,20 +48,16 @@ int main(void) {
     hwlib::wait_ms(1000);
 
     auto can_task = r2d2::module_scheduler::can_bus_pending_task_c<32>();
+    r2d2::module_scheduler::arena_alloc_c<1024> interface_allocator;
 
-    // hwlib::target::pin_out *led =
-    //     new hwlib::target::pin_out(hwlib::target::pins::led);
-    led_task_c task;
+    r2d2::module_scheduler::led_task_c task(interface_allocator);
     can_task.add_task(&task);
 
-    controller_task_c task2;
+    r2d2::module_scheduler::controller_task_c task2(interface_allocator);
     task2.create_waitable<rtos::clock>(100'000);
     can_task.add_task(&task2);
 
-    hwlib::target::pin_in button(hwlib::target::pins::d53);
-    button.pullup_enable();
-    auto task3 =
-        r2d2::module_scheduler::module_task_c<r2d2::button::module_c>(button);
+    r2d2::module_scheduler::button_task_c task3(interface_allocator);
     can_task.add_task(&task3);
 
     hwlib::cout << "pre rtos run" << hwlib::endl;

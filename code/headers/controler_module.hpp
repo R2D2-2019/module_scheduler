@@ -21,8 +21,6 @@ namespace r2d2::controller {
             // Ask the button module for the button state
             comm.request(frame_type::BUTTON_STATE);
 
-            hwlib::cout << "controller" << hwlib::endl;
-
             while (comm.has_data()) {
                 auto frame = comm.get_data();
 
