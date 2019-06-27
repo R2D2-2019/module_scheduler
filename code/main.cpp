@@ -4,9 +4,9 @@
 #include <can_bus_pending_task.hpp>
 #include <module_task.hpp>
 
-#include <button_module.hpp>
-#include <controler_module.hpp>
-#include <led_module.hpp>
+#include <button/module.hpp>
+#include <controller/module.hpp>
+#include <led/module.hpp>
 
 namespace r2d2::module_scheduler {
 
