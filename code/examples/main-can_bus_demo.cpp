@@ -1,3 +1,17 @@
+/*
+
+This main is used to test the module-scheduler
+For this programm to compile, the supplied Makefile must be used
+
+This program makes the can-bus demo run on one arduino using the
+module-scheduler
+
+for the button, I/O pin 53 should be used, there is no external pullup resistor
+needed. by pushing the button, the built-in led should turn on, by releasing the
+button, the led should turn off.
+
+*/
+
 #include <hwlib.hpp>
 #include <rtos.hpp>
 
