@@ -14,7 +14,8 @@ namespace r2d2::module_scheduler {
         std::array<rtos::waitable *, 4> waitables;
 
     public:
-        module_task_base_c() : comm(), waitables() {
+        module_task_base_c() : comm() {
+            waitables.fill(nullptr);
         }
 
         const std::array<rtos::waitable *, 4> &get_waitables() const {
