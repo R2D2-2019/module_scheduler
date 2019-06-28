@@ -30,7 +30,7 @@ namespace r2d2::module_scheduler {
     // the module
     class led_task_c : public module_task_c<r2d2::led::module_c> {
     public:
-        // fitst initalzie the output pin, then initialize the module-task with
+        // first initialize the output pin, then initialize the module-task with
         // this pin
         // the output pin must be initialized using the allocator,
         // because the pin must be initialized before the module-task
@@ -65,7 +65,7 @@ namespace r2d2::module_scheduler {
         }
 
     public:
-        // fitst initalzie the input pin, then initialize the module-task with
+        // first initialize the input pin, then initialize the module-task with
         // this pin
         // the input pin must be initialized using the allocator, because the
         // pin must be initialized before the module-task
