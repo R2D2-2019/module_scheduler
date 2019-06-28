@@ -4,13 +4,20 @@
 #include <stdint.h>
 
 namespace r2d2::module_scheduler {
-    template <size_t Size>
     class alloc_c {
-        void *alloc(size_t n);
+    public:
+        virtual void *alloc(size_t n) = 0;
+
+        template <typename T, typename... Args>
+        T &alloc_object(Args &&... args) {
+
+            void *mem = alloc(sizeof(T));
+            return *(new (mem) T(std::forward<Args>(args)...));
+        }
     };
 
     template <size_t Size = 64>
-    class arena_alloc_c : public alloc_c<Size> {
+    class arena_alloc_c : public alloc_c {
     protected:
         uint8_t buffer[Size];
         uint8_t *pos;
@@ -19,7 +26,7 @@ namespace r2d2::module_scheduler {
         arena_alloc_c() : pos(buffer) {
         }
 
-        void *alloc(size_t n) {
+        void *alloc(size_t n) override {
             size_t remaining = (buffer + Size) - pos;
 
             if (n > remaining) {

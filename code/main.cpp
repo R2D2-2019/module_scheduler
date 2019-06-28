@@ -4,26 +4,7 @@
 #include <can_bus_pending_task.hpp>
 #include <module_task.hpp>
 
-// some classes to test-compile:
-class led_module : public r2d2::base_module_c {
-public:
-    led_module(r2d2::base_comm_c &comm, hwlib::pin_out &pin)
-        : r2d2::base_module_c(comm) {
-    }
-
-    void process() override {
-        hwlib::cout << "led-module" << hwlib::endl;
-    }
-};
-class module : public r2d2::base_module_c {
-public:
-    module(r2d2::base_comm_c &comm) : r2d2::base_module_c(comm) {
-    }
-
-    void process() override {
-        hwlib::cout << "module" << hwlib::endl;
-    }
-};
+#include <moving_platform_task.hpp>
 
 int main(void) {
     // kill the watchdog
@@ -31,14 +12,19 @@ int main(void) {
 
     hwlib::wait_ms(1000);
 
+    // initialize the controller task, that checks for frames on the
+    // communication bus and set the flag for the modules that have to run
     auto can_task = r2d2::module_scheduler::can_bus_pending_task_c<32>();
+    // this allocator is used to initialize hardware interfaces and I/O pins
+    // this is needed because the interfaces need to be initialized before the
+    // module-task
+    r2d2::module_scheduler::arena_alloc_c<1024> interface_allocator;
 
-    hwlib::target::pin_out led(hwlib::target::pins::led);
-    auto task = r2d2::module_scheduler::module_task_c<led_module>(led);
+    // initialize the task for the beetle
+    auto task =
+        r2d2::module_scheduler::moving_platform_task_c(interface_allocator);
     can_task.add_task(&task);
 
-    auto task2 = r2d2::module_scheduler::module_task_c<module>();
-    can_task.add_task(&task2);
-
+    // run rtos
     rtos::run();
 }
