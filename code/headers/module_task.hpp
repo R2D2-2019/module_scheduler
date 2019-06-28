@@ -29,8 +29,7 @@ namespace r2d2::module_scheduler {
               module_task_base_c(),
               module(comm, std::forward<Args>(args)...),
               allocator() {
-            auto &flag = create_waitable<rtos::flag>("start_flag");
-            (void)flag;
+            create_waitable<rtos::flag>("start_flag");
         }
 
         /**
