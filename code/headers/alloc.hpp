@@ -6,8 +6,13 @@
 namespace r2d2::module_scheduler {
     class alloc_c {
     public:
+        // allocates a piece of memory that is large enough to fit a object of n
+        // bytes and returns a pointer to this piece of memory
         virtual void *alloc(size_t n) = 0;
 
+        // Creates a new object of type T that will be allocated to the memory
+        // reserved by this allocator
+        // All arguments for the constructor should be passed to this function.
         template <typename T, typename... Args>
         T &alloc_object(Args &&... args) {
 
@@ -26,6 +31,8 @@ namespace r2d2::module_scheduler {
         arena_alloc_c() : pos(buffer) {
         }
 
+        // allocates a piece of memory that is large enough to fit a object of n
+        // bytes and returns a pointer to this piece of memory
         void *alloc(size_t n) override {
             size_t remaining = (buffer + Size) - pos;
 
