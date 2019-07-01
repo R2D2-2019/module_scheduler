@@ -21,7 +21,7 @@ SEARCH  := ./headers ./src
 MOVING	:= ../../moving_platform/code
 SEARCH  += $(MOVING)/headers $(MOVING)/src
 SOURCES += $(wildcard $(MOVING)/src/*.cpp)
-HEADERS += $(wildcard $(MOVING)/headers/*.hpp) ../../../libraries/internal_communication
+HEADERS += $(wildcard $(MOVING)/headers/*.hpp)
 
 # set REATIVE to the next higher directory 
 # and defer to the Makefile.due there

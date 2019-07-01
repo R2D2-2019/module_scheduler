@@ -23,6 +23,12 @@ namespace r2d2::module_scheduler {
         arena_alloc_c<WaitableAllocSize> allocator;
 
     public:
+        // initializes the module and its task
+        // the constructor for the module is called interaly, all but the first
+        // constructor parameter must be passed to this constructor
+        // this constructor assumes the first parameter of the module's
+        // constructor is of the type base_comm_c. If this is not the case, a
+        // adapter should be written.
         template <typename... Args>
         explicit module_task_c(Args &&... args)
             : rtos::task<StackSize>("task_module"),
@@ -32,11 +38,9 @@ namespace r2d2::module_scheduler {
             create_waitable<rtos::flag>("start_flag");
         }
 
-        /**
-         * Create a waitable that will be linked to this task.
-         * All arguments after the 'this' argument (the first argument)
-         * of the task should be passed.
-         */
+        // Creates a waitable that will be linked to this task.
+        // All arguments after the 'this' argument (the first argument)
+        // of the task should be passed to this function.
         template <typename T, typename... Args>
         T &create_waitable(Args &&... args) {
             if (next_waitable_index == 4) {
@@ -54,6 +58,7 @@ namespace r2d2::module_scheduler {
             return *waitable;
         }
 
+        // rtos task main
         void main() override {
             for (;;) {
                 this->wait();
