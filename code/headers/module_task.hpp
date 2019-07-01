@@ -23,7 +23,7 @@ namespace r2d2::module_scheduler {
         arena_alloc_c<WaitableAllocSize> allocator;
 
     public:
-        // initializes the module and it's task
+        // initializes the module and its task
         // the constructor for the module is called interaly, all but the first
         // constructor parameter must be passed to this constructor
         // this constructor assumes the first parameter of the module's

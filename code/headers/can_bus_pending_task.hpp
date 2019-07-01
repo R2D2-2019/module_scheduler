@@ -13,7 +13,7 @@ namespace r2d2::module_scheduler {
 
     public:
         // adds a module to the list of tasks
-        // this task will loop thru this list to check for frames for every
+        // this task will loop through this list to check for frames for every
         // module
         void add_task(module_task_base_c *task) {
             if (next_task_index == Size) {
