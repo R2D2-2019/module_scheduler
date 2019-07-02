@@ -20,6 +20,10 @@ include 		  $(internal_comm)/Makefile.inc
 HWLIB             ?= ../../../libraries/hwlib
 include           $(HWLIB)/Makefile.inc
 
+#add USART_library
+USART               ?= ../../../libraries/USART_library
+include              $(USART)/Makefile.inc
+
 # set BMPTK to the bmptk subdirectory
 BMPTK := ../../../programs/bmptk
 

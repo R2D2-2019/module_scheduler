@@ -17,11 +17,7 @@ HEADERS := $(wildcard headers/*.hpp)
 # other places to look for files for this project
 SEARCH  := ./headers ./src
 
-#add moving-platform
-MOVING	:= ../../moving_platform/code
-SEARCH  += $(MOVING)/headers $(MOVING)/src
-SOURCES += $(wildcard $(MOVING)/src/*.cpp)
-HEADERS += $(wildcard $(MOVING)/headers/*.hpp)
+SEARCH	+= ../../../libraries/internal_communication/examples/led_button
 
 # set REATIVE to the next higher directory 
 # and defer to the Makefile.due there
